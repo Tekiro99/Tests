@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Насколько ты Пиздабол?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+        :root {
+            --accent-color: #FF6B35;
+            --accent-hover-color: #E55A31;
+            --text-color: #f0f0f0;
+            --bg-color: rgba(25, 25, 35, 0.4);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --bg-grad-start: #2C1810;
+            --bg-grad-end: #4A2C2A;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+            padding: 20px;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .quiz-container {
+            background: var(--bg-color);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: rgba(0,0,0,0.2);
+            height: 8px;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-color);
+            transition: width 0.4s ease-in-out;
+        }
+
+        .quiz-header {
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .quiz-header p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #question-container {
+            padding: 0 40px 40px;
+        }
+
+        #question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            animation: question-in 0.4s forwards;
+        }
+
+        @keyframes question-in {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .answers {
+            list-style-type: none;
+        }
+
+        .answers li {
+            margin-bottom: 15px;
+        }
+
+        .answers label {
+            display: block;
+            padding: 18px 20px;
+            background-color: rgba(255,255,255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 16px;
+        }
+        
+        .answers label:hover {
+            background-color: rgba(255,255,255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .answers input[type="radio"] {
+            display: none;
+        }
+
+        .answers input[type="radio"]:checked + label {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .quiz-footer {
+            padding: 0 40px 40px;
+        }
+        
+        .action-btn {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            display: block;
+            width: 100%;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            background-color: var(--accent-hover-color);
+            transform: scale(1.02);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: scale(0.99);
+        }
+        
+        .action-btn:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        #result-container {
+            padding: 40px;
+            text-align: center;
+        }
+
+        #percentage {
+            font-size: 72px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin: 10px 0;
+            text-shadow: 0 0 15px rgba(255, 107, 53, 0.5);
+        }
+
+        #result-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        #interpretation {
+            font-size: 16px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+        }
+
+        #copy-btn {
+            margin-top: 10px;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        #copy-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        #copy-notification {
+            margin-top: 15px;
+            color: var(--accent-color);
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .back-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        .back-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container" id="quiz-container">
+        <div class="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+
+        <div id="content-area">
+            <div class="quiz-header">
+                <button onclick="window.location.href='index.html'" class="action-btn back-btn">← Назад к тестам</button>
+                <h1>🎭 Тест: Насколько ты Пиздабол?</h1>
+                <p>Честный тест на искренность. Готовы узнать правду о себе в сложных моральных ситуациях?</p>
+            </div>
+
+            <div id="question-container">
+                <p id="question"></p>
+                <ul class="answers" id="answers"></ul>
+            </div>
+            
+            <div id="result-container" class="hidden">
+                <h2>Ваш результат:</h2>
+                <div id="percentage">0%</div>
+                <h3 id="result-title"></h3>
+                <p id="interpretation"></p>
+                <button id="copy-btn" class="action-btn">Копировать результат</button>
+                <p id="copy-notification">Скопировано!</p>
+                <button onclick="window.location.href='index.html'" class="action-btn back-btn" style="margin-top: 15px;">← Назад к тестам</button>
+            </div>
+
+            <div class="quiz-footer" id="quiz-footer">
+                <button id="submit-btn" class="action-btn" disabled>Далее</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            { 
+                question: "Вы случайно повредили машину на парковке. Никто не видел. Хозяин машины — ваш неприятный сосед, который постоянно жалуется на вас в управляющую компанию. Что вы сделаете?", 
+                answers: [
+                    { text: "Оставлю записку с контактами и возмещу ущерб, несмотря на наши отношения.", value: 0 }, 
+                    { text: "Притворюсь, что ничего не случилось, но буду мучиться совестью.", value: 7 }, 
+                    { text: "Уеду, считая это справедливой местью за его жалобы.", value: 10 }, 
+                    { text: "Попытаюсь незаметно исправить повреждение сам.", value: 4 }
+                ] 
+            },
+            { 
+                question: "На собеседовании вас спрашивают о навыке, которого у вас нет, но который критически важен для должности. Вы очень нуждаетесь в этой работе. Ваши действия?", 
+                answers: [
+                    { text: "Честно признаюсь, что не владею этим навыком, но готов быстро обучиться.", value: 1 }, 
+                    { text: "Слегка преувеличу свои способности, надеясь быстро подтянуться.", value: 6 }, 
+                    { text: "Солгу о наличии опыта и попытаюсь выкрутиться потом.", value: 10 }, 
+                    { text: "Переведу разговор на другие свои сильные стороны.", value: 3 }
+                ] 
+            },
+            { 
+                question: "Ваш лучший друг просит одолжить крупную сумму денег 'на пару дней'. Вы знаете, что у него проблемы с азартными играми, но он клянется, что это на лечение мамы. У вас есть эти деньги, но они отложены на отпуск.", 
+                answers: [
+                    { text: "Открыто выражу сомнения и попрошу доказательства, рискуя испортить дружбу.", value: 2 }, 
+                    { text: "Дам деньги, но тайно проверю, на что он их потратит.", value: 6 }, 
+                    { text: "Солгу, что у меня нет денег, чтобы не давать и не объяснять причины.", value: 9 }, 
+                    { text: "Честно скажу, что не доверяю ему с деньгами из-за его зависимости.", value: 0 }
+                ] 
+            },
+            { 
+                question: "В ресторане официант по ошибке не включил в счет самое дорогое блюдо, которое вы заказывали. Вы это заметили. Ресторан принадлежит крупной сети, а официант — молодой студент.", 
+                answers: [
+                    { text: "Сразу укажу на ошибку и доплачу.", value: 0 }, 
+                    { text: "Оставлю большие чаевые, считая это компенсацией.", value: 4 }, 
+                    { text: "Промолчу, но буду чувствовать себя неловко.", value: 7 }, 
+                    { text: "Уйду, считая это удачей и ошибкой ресторана.", value: 10 }
+                ] 
+            },
+            { 
+                question: "Вы нашли кошелек с большой суммой денег и документами. В кошельке есть фото семьи и визитка владельца — успешного бизнесмена. Рядом есть банкомат, а до конца месяца у вас серьезные финансовые проблемы.", 
+                answers: [
+                    { text: "Немедленно свяжусь с владельцем и верну кошелек полностью.", value: 0 }, 
+                    { text: "Возьму небольшую сумму 'за находку' и верну остальное.", value: 8 }, 
+                    { text: "Сдам кошелек в полицию, не трогая содержимое.", value: 1 }, 
+                    { text: "Возьму деньги, а документы выброшу или сдам в полицию позже.", value: 10 }
+                ] 
+            },
+            { 
+                question: "В соцсетях вы видите пост своего знакомого о том, как он помогает бедным и получает сотни лайков. Вы знаете, что он никогда никому не помогал. Как поступите?", 
+                answers: [
+                    { text: "Напишу комментарий, что это ложь, рискуя публичным конфликтом.", value: 1 }, 
+                    { text: "Напишу ему лично о своём недоумении.", value: 3 }, 
+                    { text: "Промолчу, не желая портить отношения.", value: 7 }, 
+                    { text: "Поставлю лайк, чтобы поддержать его имидж.", value: 10 }
+                ] 
+            },
+            { 
+                question: "На работе вы ошиблись в важном проекте, но ошибку можно списать на коллегу, который уже в отпуске. От этого зависит ваше повышение.", 
+                answers: [
+                    { text: "Признаю свою ошибку и понесу ответственность.", value: 0 }, 
+                    { text: "Попробую исправить ошибку незаметно, не привлекая внимания.", value: 5 }, 
+                    { text: "Позвоню коллеге и объясню ситуацию, попросив разрешения взять вину на себя.", value: 8 }, 
+                    { text: "Спишу всё на коллегу, считая, что он сам виноват в нечётких инструкциях.", value: 10 }
+                ] 
+            },
+            { 
+                question: "Ваш сосед по комнате в общежитии постоянно приводит девушек и шумит по ночам. Он также не платит за коммунальные услуги, которые вы вынуждены покрывать. Однажды вы случайно увидели, что он оставил открытым свой лаптоп с открытым банковским приложением.", 
+                answers: [
+                    { text: "Не буду смотреть на чужие финансы и просто скажу ему закрыть лаптоп.", value: 2 }, 
+                    { text: "Посмотрю на баланс, чтобы понять, может ли он платить за коммуналку.", value: 6 }, 
+                    { text: "Посмотрю, сколько у него денег, и сделаю скриншот на случай конфликта.", value: 8 }, 
+                    { text: "Попробую перевести себе немного денег в качестве компенсации за страдания.", value: 10 }
+                ] 
+            },
+            { 
+                question: "У вас есть возможность получить ценную информацию о конкурентах вашей компании от их бывшего сотрудника, который теперь работает в вашей компании. Он предлагает эту информацию за деньги.", 
+                answers: [
+                    { text: "Откажусь, так как это неэтично и может навредить его карьере.", value: 0 }, 
+                    { text: "Попрошу информацию бесплатно, намекнув, что это поможет ему в компании.", value: 7 }, 
+                    { text: "Куплю информацию, но попрошу никому об этом не рассказывать.", value: 10 }, 
+                    { text: "Подожду и посмотрю, можно ли получить эту информацию легальным путём.", value: 2 }
+                ] 
+            }
+        ];
+
+        const progressBar = document.getElementById('progress-bar');
+        const questionContainer = document.getElementById('question-container');
+        const resultContainer = document.getElementById('result-container');
+        const quizHeader = document.querySelector('.quiz-header');
+        const quizFooter = document.getElementById('quiz-footer');
+
+        const questionEl = document.getElementById('question');
+        const answersEl = document.getElementById('answers');
+        const submitBtn = document.getElementById('submit-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyNotification = document.getElementById('copy-notification');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let finalResult = {};
+
+        loadQuiz();
+
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function loadQuiz() {
+            deselectAnswers();
+            updateProgressBar();
+            
+            const currentQuizData = quizData[currentQuestionIndex];
+            questionEl.style.animation = 'none';
+            void questionEl.offsetWidth;
+            questionEl.style.animation = 'question-in 0.4s forwards';
+            
+            questionEl.innerText = currentQuizData.question;
+            
+            answersEl.innerHTML = ''; 
+            currentQuizData.answers.forEach(answer => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <input type="radio" name="answer" id="${answer.value}-${answer.text}" value="${answer.value}">
+                    <label for="${answer.value}-${answer.text}">${answer.text}</label>
+                `;
+                answersEl.appendChild(li);
+            });
+            
+            submitBtn.disabled = true;
+            document.querySelectorAll('input[name="answer"]').forEach(input => {
+                input.addEventListener('change', () => {
+                    submitBtn.disabled = false;
+                });
+            });
+        }
+
+        function deselectAnswers() {
+            const answerEls = document.querySelectorAll('input[name="answer"]');
+            answerEls.forEach(answerEl => answerEl.checked = false);
+        }
+
+        function getSelected() {
+            let answer;
+            const answerEls = document.querySelectorAll('input[name="answer"]');
+            answerEls.forEach(answerEl => {
+                if(answerEl.checked) {
+                    answer = answerEl.value;
+                }
+            });
+            return answer;
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const answer = getSelected();
+            if(answer) {
+                score += parseInt(answer);
+                currentQuestionIndex++;
+                if(currentQuestionIndex < quizData.length) {
+                    loadQuiz();
+                } else {
+                    progressBar.style.width = `100%`;
+                    showResults();
+                }
+            }
+        });
+
+        function showResults() {
+            const maxScore = quizData.length * 10;
+            const percentage = Math.round((score / maxScore) * 100);
+
+            let resultTitle, interpretation;
+
+            if (percentage <= 20) {
+                resultTitle = "Честная душа";
+                interpretation = "Вы удивительно честный человек. Даже в самых сложных ситуациях вы стараетесь поступать по совести. Возможно, иногда это причиняет вам неудобства, но ваша искренность — это редкое и ценное качество в современном мире.";
+            } else if (percentage <= 45) {
+                resultTitle = "Практичный реалист";
+                interpretation = "Вы умеете балансировать между честностью и практичностью. Не святой, но и не грешник. Иногда позволяете себе 'белую ложь' или удобную версию правды, но в целом остаётесь довольно порядочным человеком.";
+            } else if (percentage <= 70) {
+                resultTitle = "Гибкая мораль";
+                interpretation = "Ваша честность зависит от обстоятельств. Вы можете солгать или приукрасить правду, если это выгодно. При этом умеете оправдывать свои поступки и находить логические объяснения своему поведению. Главное — не переходить грань.";
+            } else {
+                resultTitle = "Мастер адаптации";
+                interpretation = "Правда для вас — это гибкое понятие. Вы легко подстраиваете факты под свои нужды и не испытываете особых угрызений совести. Возможно, это помогает вам в жизни, но будьте осторожны — репутация строится годами, а разрушается мгновенно.";
+            }
+            
+            finalResult = { percentage, resultTitle, interpretation };
+
+            quizHeader.classList.add('hidden');
+            questionContainer.classList.add('hidden');
+            quizFooter.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+
+            document.getElementById('percentage').innerText = `${percentage}%`;
+            document.getElementById('result-title').innerText = resultTitle;
+            document.getElementById('interpretation').innerText = interpretation;
+        }
+        
+        copyBtn.addEventListener('click', () => {
+            const { percentage, resultTitle, interpretation } = finalResult;
+            const textToCopy = `
+Мой результат в тесте "Насколько ты Пиздабол?":
+
+🎭 ${percentage}% - ${resultTitle}
+💬 Вердикт: "${interpretation}"
+            `.trim();
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyNotification.style.opacity = '1';
+                setTimeout(() => {
+                    copyNotification.style.opacity = '0';
+                }, 2000);
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        });
+    </script>
+</body>
+</html>
