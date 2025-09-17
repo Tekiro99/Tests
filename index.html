@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Насколько ты Яныг? v2.0</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+        :root {
+            --accent-color: #8A2BE2; /* Яркий фиолетовый */
+            --accent-hover-color: #9932CC;
+            --text-color: #f0f0f0;
+            --bg-color: rgba(25, 25, 35, 0.4);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --bg-grad-start: #141E30;
+            --bg-grad-end: #243B55;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+            padding: 20px;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .quiz-container {
+            background: var(--bg-color);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: rgba(0,0,0,0.2);
+            height: 8px;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-color);
+            transition: width 0.4s ease-in-out;
+        }
+
+        .quiz-header {
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .quiz-header p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #question-container {
+            padding: 0 40px 40px;
+        }
+
+        #question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            animation: question-in 0.4s forwards;
+        }
+
+        @keyframes question-in {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .answers {
+            list-style-type: none;
+        }
+
+        .answers li {
+            margin-bottom: 15px;
+        }
+
+        .answers label {
+            display: block;
+            padding: 18px 20px;
+            background-color: rgba(255,255,255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 16px;
+        }
+        
+        .answers label:hover {
+            background-color: rgba(255,255,255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .answers input[type="radio"] {
+            display: none;
+        }
+
+        .answers input[type="radio"]:checked + label {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .quiz-footer {
+            padding: 0 40px 40px;
+        }
+        
+        .action-btn {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            display: block;
+            width: 100%;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            background-color: var(--accent-hover-color);
+            transform: scale(1.02);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: scale(0.99);
+        }
+        
+        .action-btn:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        #result-container {
+            padding: 40px;
+            text-align: center;
+        }
+
+        #percentage {
+            font-size: 72px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin: 10px 0;
+            text-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+        }
+
+        #result-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        #interpretation {
+            font-size: 16px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+        }
+
+        #copy-btn {
+            margin-top: 10px;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        #copy-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        #copy-notification {
+            margin-top: 15px;
+            color: var(--accent-color);
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container" id="quiz-container">
+        <div class="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+
+        <div id="content-area">
+            <div class="quiz-header">
+                <h1>Тест: Насколько ты Яныг?</h1>
+                <p>Определяем грань между здоровой биологией и озабоченностью.</p>
+            </div>
+
+            <div id="question-container">
+                <p id="question"></p>
+                <ul class="answers" id="answers"></ul>
+            </div>
+            
+            <div id="result-container" class="hidden">
+                <h2>Ваш результат:</h2>
+                <div id="percentage">0%</div>
+                <h3 id="result-title"></h3>
+                <p id="interpretation"></p>
+                <button id="copy-btn" class="action-btn">Копировать результат</button>
+                <p id="copy-notification">Скопировано!</p>
+            </div>
+
+            <div class="quiz-footer" id="quiz-footer">
+                <button id="submit-btn" class="action-btn" disabled>Далее</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            { question: "Вы в картинной галерее. Перед вами две картины: одна — потрясающий пейзаж, другая — откровенное, но эстетичное изображение нагого тела. Какая из них надолго завладеет вашим вниманием?", answers: [{ text: "Пейзаж, я ценю природу и технику художника.", value: 0 }, { text: "Задержусь у обеих, но нагое тело вызывает больше эмоций и мыслей.", value: 7 }, { text: "Конечно, нагое тело. Это самая естественная и притягательная красота.", value: 10 }, { text: "Посмотрю на обе, но больше буду думать о том, какой кофе выпить после.", value: 2 }] },
+            { question: "Ваш друг/подруга противоположного пола просит о помощи поздно вечером — нужно срочно заехать и 'просто поговорить', потому что у него/нее тяжелый день. Ваши первые мысли?", answers: [{ text: "Конечно, помогу. Друзьям надо помогать, неважно в какое время.", value: 0 }, { text: "'Просто поговорить'... Звучит как приглашение. Интересно.", value: 10 }, { text: "Надеюсь, ничего серьезного. Постараюсь поддержать эмоционально.", value: 2 }, { text: "Помогу, но буду держать дистанцию. Мало ли какие намеки.", value: 5 }] },
+            { question: "Вы выбираете фильм для вечера с потенциальным партнером. Что вы предпочтете?", answers: [{ text: "Запутанный психологический триллер, чтобы потом было что обсудить.", value: 2 }, { text: "Легкую и смешную комедию для создания непринужденной атмосферы.", value: 4 }, { text: "Драму с глубоким смыслом, чтобы увидеть эмоциональный отклик человека.", value: 0 }, { text: "Фильм с большим количеством страстных и откровенных сцен. Это задаст правильное настроение.", value: 10 }] },
+            { question: "Вы знакомитесь с очень привлекательным человеком. Что из этого станет для вас решающим 'красным флагом', чтобы прекратить общение?", answers: [{ text: "Отсутствие чувства юмора и общих интересов.", value: 2 }, { text: "Грубость по отношению к обслуживающему персоналу.", value: 0 }, { text: "Он/она намекает, что не торопится с физической близостью.", value: 10 }, { text: "Разные взгляды на политику и финансы.", value: 4 }] },
+            { question: "Что для вас идеальное свидание?", answers: [{ text: "Долгая прогулка по парку с глубокими разговорами обо всем на свете.", value: 0 }, { text: "Ужин в хорошем ресторане, затем танцы в баре, флирт и ожидание продолжения.", value: 8 }, { text: "Совместное приготовление ужина дома, уютная атмосфера и просмотр фильма в обнимку.", value: 4 }, { text: "Сразу договориться провести вечер дома с вином и посмотреть, куда все зайдет.", value: 10 }] },
+            { question: "На что вы в первую очередь обращаете внимание в профиле человека в приложении для знакомств?", answers: [{ text: "На фотографии, особенно на фигуру и внешние данные.", value: 9 }, { text: "На описание 'о себе', ищу схожие ценности и интересы.", value: 1 }, { text: "На наличие чувства юмора в анкете.", value: 3 }, { text: "На все понемногу, создаю общее впечатление.", value: 5 }] },
+            { question: "У вас был ужасный день на работе. Что лучше всего поможет вам расслабиться вечером?", answers: [{ text: "Горячая ванна, хорошая книга или сериал.", value: 2 }, { text: "Встреча с друзьями, чтобы выговориться и отвлечься.", value: 0 }, { text: "Страстный секс, чтобы сбросить все напряжение.", value: 10 }, { text: "Вкусная еда и бокал вина в одиночестве.", value: 4 }] },
+            { question: "Ваш партнер хочет сделать вам подарок. Что бы вы предпочли?", answers: [{ text: "Что-то сделанное своими руками, в чем есть душа.", value: 0 }, { text: "Сертификат на совместный поход в СПА или массаж.", value: 5 }, { text: "Красивое и дорогое нижнее белье или интимная игрушка.", value: 10 }, { text: "Новый гаджет или что-то полезное для моего хобби.", value: 2 }] },
+            { question: "Представьте, что вы можете обладать одной суперспособностью. Какую выберете?", answers: [{ text: "Читать мысли, чтобы лучше понимать людей.", value: 2 }, { text: "Телепортация, чтобы путешествовать по всему миру.", value: 1 }, { text: "Принимать облик любого человека, чтобы прожить чужую жизнь.", value: 7 }, { text: "Способность вызывать у любого человека непреодолимое влечение к себе.", value: 10 }] },
+            { question: "Ваш близкий друг рассказывает вам о своей новой влюбленности, описывая душевные качества партнера. О чем вы спросите в первую очередь?", answers: [{ text: "«А он/она красивый/ая? Фотку покажешь?»", value: 8 }, { text: "«Как вы познакомились? Что тебя в нем/ней зацепило?»", value: 1 }, { text: "«Вы уже спали? Как все прошло?»", value: 10 }, { text: "«Надеюсь, этот человек сделает тебя счастливым/ой.»", value: 0 }] }
+        ];
+
+        const progressBar = document.getElementById('progress-bar');
+        const questionContainer = document.getElementById('question-container');
+        const resultContainer = document.getElementById('result-container');
+        const quizHeader = document.querySelector('.quiz-header');
+        const quizFooter = document.getElementById('quiz-footer');
+
+        const questionEl = document.getElementById('question');
+        const answersEl = document.getElementById('answers');
+        const submitBtn = document.getElementById('submit-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyNotification = document.getElementById('copy-notification');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let finalResult = {};
+
+        loadQuiz();
+
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function loadQuiz() {
+            deselectAnswers();
+            updateProgressBar();
+            
+            const currentQuizData = quizData[currentQuestionIndex];
+            questionEl.style.animation = 'none';
+            void questionEl.offsetWidth; // Trigger reflow
+            questionEl.style.animation = 'question-in 0.4s forwards';
+            
+            questionEl.innerText = currentQuizData.question;
+            
+            answersEl.innerHTML = ''; 
+            currentQuizData.answers.forEach(answer => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <input type="radio" name="answer" id="${answer.value}-${answer.text}" value="${answer.value}">
+                    <label for="${answer.value}-${answer.text}">${answer.text}</label>
+                `;
+                answersEl.appendChild(li);
+            });
+            
+            submitBtn.disabled = true;
+            document.querySelectorAll('input[name="answer"]').forEach(input => {
+                input.addEventListener('change', () => {
+                    submitBtn.disabled = false;
+                });
+            });
+        }
+
+        function deselectAnswers() {
+            const answerEls = document.querySelectorAll('input[name="answer"]');
+            answerEls.forEach(answerEl => answerEl.checked = false);
+        }
+
+        function getSelected() {
+            let answer;
+            const answerEls = document.querySelectorAll('input[name="answer"]');
+            answerEls.forEach(answerEl => {
+                if(answerEl.checked) {
+                    answer = answerEl.value;
+                }
+            });
+            return answer;
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const answer = getSelected();
+            if(answer) {
+                score += parseInt(answer);
+                currentQuestionIndex++;
+                if(currentQuestionIndex < quizData.length) {
+                    loadQuiz();
+                } else {
+                    progressBar.style.width = `100%`;
+                    showResults();
+                }
+            }
+        });
+
+        function showResults() {
+            const maxScore = quizData.length * 10;
+            const percentage = Math.round((score / maxScore) * 100);
+
+            let resultTitle, interpretation;
+
+            if (percentage <= 20) {
+                resultTitle = "Здоровый прагматизм";
+                interpretation = "Вы твердо стоите на ногах. Физическое влечение для вас важно, но оно никогда не затмевает разум, дружбу и эмоциональную связь. Вы цените в людях в первую очередь личность. Это зрелая и здоровая позиция.";
+            } else if (percentage <= 50) {
+                resultTitle = "Золотая середина";
+                interpretation = "Вы обладаете здоровой сексуальностью и цените гармонию между душой и телом. Для вас важна и страсть, и эмоциональная связь, и вы умело их балансируете. Вы не зациклены на сексе, но и не приуменьшаете его роли.";
+            } else if (percentage <= 80) {
+                resultTitle = "Высокий градус";
+                interpretation = "Страсть и физическое влечение играют одну из главных ролей в вашей жизни. Вы энергичны и цените химию между людьми. Это может быть мощным двигателем, но есть риск, что иногда вы упускаете из виду другие важные аспекты отношений.";
+            } else {
+                resultTitle = "На грани Яныгства";
+                interpretation = "Похоже, мысли о сексе занимают доминирующее положение в вашей картине мира. Почти любую ситуацию вы рассматриваете через призму влечения. Это может давать яркие эмоции, но будьте осторожны: такая фиксация может мешать строить глубокие отношения.";
+            }
+            
+            finalResult = { percentage, resultTitle, interpretation };
+
+            quizHeader.classList.add('hidden');
+            questionContainer.classList.add('hidden');
+            quizFooter.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+
+            document.getElementById('percentage').innerText = `${percentage}%`;
+            document.getElementById('result-title').innerText = resultTitle;
+            document.getElementById('interpretation').innerText = interpretation;
+        }
+        
+        copyBtn.addEventListener('click', () => {
+            const { percentage, resultTitle, interpretation } = finalResult;
+            const textToCopy = `
+Мой результат в тесте "Насколько ты Яныг?":
+
+📊 ${percentage}% - ${resultTitle}
+💬 Вердикт: "${interpretation}"
+            `.trim();
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyNotification.style.opacity = '1';
+                setTimeout(() => {
+                    copyNotification.style.opacity = '0';
+                }, 2000);
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        });
+
+    </script>
+</body>
+</html>
