@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Насколько ты Токсик?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+        :root {
+            --accent-color: #DC143C;
+            --accent-hover-color: #B22222;
+            --text-color: #f0f0f0;
+            --bg-color: rgba(25, 25, 35, 0.4);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --bg-grad-start: #2F1B14;
+            --bg-grad-end: #8B0000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+            padding: 20px;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .quiz-container {
+            background: var(--bg-color);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: rgba(0,0,0,0.2);
+            height: 8px;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #DC143C, #8B0000, #2F1B14);
+            transition: width 0.4s ease-in-out;
+        }
+
+        .quiz-header {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .quiz-header p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #question-container {
+            padding: 0 30px 30px;
+        }
+
+        #question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            animation: question-in 0.4s forwards;
+        }
+
+        @keyframes question-in {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .answers {
+            list-style-type: none;
+        }
+
+        .answers li {
+            margin-bottom: 10px;
+        }
+
+        .answers label {
+            display: block;
+            padding: 14px 16px;
+            background-color: rgba(255,255,255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 15px;
+            line-height: 1.3;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .answers label:hover {
+            background-color: rgba(255,255,255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .answers input[type="radio"] {
+            display: none;
+        }
+
+        .answers input[type="radio"]:checked + label {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .quiz-footer {
+            padding: 0 30px 30px;
+        }
+        
+        .action-btn {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            display: block;
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            background-color: var(--accent-hover-color);
+            transform: scale(1.02);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: scale(0.99);
+        }
+        
+        .action-btn:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        #result-container {
+            padding: 30px;
+            text-align: center;
+        }
+
+        #percentage {
+            font-size: 60px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin: 8px 0;
+            text-shadow: 0 0 15px rgba(220, 20, 60, 0.5);
+        }
+
+        #result-title {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+        
+        #interpretation {
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 25px;
+        }
+
+        #copy-btn {
+            margin-top: 10px;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        #copy-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        #copy-notification {
+            margin-top: 15px;
+            color: var(--accent-color);
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .back-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        .back-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .quiz-container { max-width: 100%; margin: 0; }
+            .quiz-header { padding: 20px 20px 15px 20px; }
+            h1 { font-size: 20px; margin-bottom: 6px; }
+            .quiz-header p { font-size: 13px; }
+            #question-container { padding: 0 20px 20px; }
+            #question { font-size: 16px; margin-bottom: 15px; line-height: 1.3; }
+            .answers li { margin-bottom: 8px; }
+            .answers label { padding: 12px 14px; font-size: 14px; line-height: 1.25; }
+            .quiz-footer { padding: 0 20px 20px; }
+            .action-btn { padding: 14px; font-size: 15px; }
+            #result-container { padding: 20px; }
+            #percentage { font-size: 48px; margin: 6px 0; }
+            #result-title { font-size: 18px; margin-bottom: 10px; }
+            #interpretation { font-size: 13px; line-height: 1.4; margin-bottom: 20px; }
+            .back-btn { margin-bottom: 15px; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .quiz-header { padding: 15px 15px 12px 15px; }
+            h1 { font-size: 18px; }
+            #question-container { padding: 0 15px 15px; }
+            #question { font-size: 15px; margin-bottom: 12px; }
+            .answers label { padding: 10px 12px; font-size: 13px; }
+            .quiz-footer { padding: 0 15px 15px; }
+            #result-container { padding: 15px; }
+            #percentage { font-size: 42px; }
+            #result-title { font-size: 16px; }
+            #interpretation { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="quiz-container">
+        <div class="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+        <div id="content-area">
+            <div class="quiz-header">
+                <button onclick="window.location.href='index.html'" class="action-btn back-btn">← Назад к тестам</button>
+                <h1>☠️💀 Тест: Насколько ты Токсик?</h1>
+                <p>Универсальный тест на токсичность личности. Готов узнать правду о своих тёмных сторонах? Провокационные ситуации с моральными дилеммами.</p>
+            </div>
+            <div id="question-container">
+                <p id="question"></p>
+                <ul class="answers" id="answers"></ul>
+            </div>
+            <div id="result-container" class="hidden">
+                <h2>Ваш результат:</h2>
+                <div id="percentage">0%</div>
+                <h3 id="result-title"></h3>
+                <p id="interpretation"></p>
+                <button id="copy-btn" class="action-btn">Копировать результат</button>
+                <p id="copy-notification">Скопировано!</p>
+                <button onclick="window.location.href='index.html'" class="action-btn back-btn" style="margin-top: 15px;">← Назад к тестам</button>
+            </div>
+            <div class="quiz-footer" id="quiz-footer">
+                <button id="submit-btn" class="action-btn" disabled>Далее</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const quizData = [
+            { 
+                question: "Твой коллега получил повышение, которое ты считал своим. На корпоративе все его поздравляют. Как ведешь себя?", 
+                answers: [
+                    { text: "Искренне поздравлю и пожелаю удачи, хотя внутри расстроен.", value: 0 }, 
+                    { text: "Поздравлю с натянутой улыбкой, но буду избегать разговоров с ним.", value: 5 }, 
+                    { text: "Буду саркастично комментировать: 'Ну конечно, некоторым просто везет с связями'.", value: 8 }, 
+                    { text: "Расскажу всем, какие ошибки он делал в прошлых проектах и что повышение незаслуженное.", value: 10 }
+                ] 
+            },
+            {
+                question: "Твой друг просит одолжить крупную сумму денег. Ты можешь помочь, но это будет для тебя ощутимо. Что делаешь?",
+                answers: [
+                    { text: "Честно объясню своё финансовое положение и предложу посильную помощь.", value: 0 },
+                    { text: "Дам денег, но потом буду регулярно напоминать об этом долге и своей щедрости.", value: 7 },
+                    { text: "Скажу, что денег нет, но потом буду хвастаться дорогими покупками в соцсетях.", value: 9 },
+                    { text: "Дам денег под проценты, ведь дружба дружбой, а деньги врозь.", value: 10 }
+                ]
+            },
+            { 
+                question: "В групповом проекте один участник явно работает меньше всех, но получает ту же оценку. Твоя реакция?", 
+                answers: [
+                    { text: "Поговорю с ним лично и предложу распределить обязанности четче.", value: 1 }, 
+                    { text: "Обращусь к преподавателю с просьбой пересмотреть систему оценивания.", value: 3 }, 
+                    { text: "Буду публично комментировать его вклад: 'А Вася опять всех нас выручил!'", value: 8 }, 
+                    { text: "Саботирую его часть работы перед сдачей, чтобы все увидели его некомпетентность.", value: 10 }
+                ] 
+            },
+            { 
+                question: "Твоя подруга начала встречаться с парнем, который тебе нравился. Как отреагируешь?", 
+                answers: [
+                    { text: "Расстроюсь, но пожелаю им счастья и постараюсь двигаться дальше.", value: 0 }, 
+                    { text: "Буду поддерживать дружбу, но внутренне буду искать недостатки в их отношениях.", value: 5 }, 
+                    { text: "Начну тонко намекать ей на его недостатки и сомнительное прошлое.", value: 8 }, 
+                    { text: "Расскажу ей 'случайно' о том, как он флиртовал со мной еще недавно.", value: 10 }
+                ] 
+            },
+            { 
+                question: "Ты видишь, как незнакомец в кафе оставил телефон на столе и ушел. Что делаешь?", 
+                answers: [
+                    { text: "Догоню его или попрошу официанта сохранить телефон до его возвращения.", value: 0 }, 
+                    { text: "Скажу официанту, но не буду специально искать владельца.", value: 2 }, 
+                    { text: "Подожду пару минут, а если не вернется - заберу. Сам виноват.", value: 8 }, 
+                    { text: "Незаметно заберу телефон. Если человек такой рассеянный, то это урок ему.", value: 10 }
+                ] 
+            },
+            { 
+                question: "В социальных сетях ты видишь неудачное фото своего знакомого. Твои действия?", 
+                answers: [
+                    { text: "Проигнорирую или поставлю лайк в поддержку.", value: 0 }, 
+                    { text: "Напишу в личные сообщения, что может стоит удалить фото.", value: 3 }, 
+                    { text: "Сделаю скриншот и покажу друзьям со словами 'Посмотрите на это!'.", value: 8 }, 
+                    { text: "Оставлю саркастичный комментарий, замаскированный под комплимент.", value: 10 }
+                ] 
+            },
+            { 
+                question: "Твой начальник несправедливо критикует твою работу при всех. Как отвечаешь?", 
+                answers: [
+                    { text: "Выслушаю критику и попрошу конструктивных предложений по улучшению.", value: 1 }, 
+                    { text: "Защищу свою позицию аргументами, но останусь уважительным.", value: 2 }, 
+                    { text: "Покорно приму критику, но потом буду всем рассказывать, какой начальник неадекватный.", value: 7 }, 
+                    { text: "Публично укажу на его собственные ошибки и некомпетентность в управлении.", value: 10 }
+                ] 
+            },
+            { 
+                question: "Ты случайно услышал сплетню о своем знакомом. Информация компрометирующая, но недостоверная. Что делаешь?", 
+                answers: [
+                    { text: "Игнорирую сплетню и не передаю дальше непроверенную информацию.", value: 0 }, 
+                    { text: "Расскажу только самому близкому другу, но попрошу никому не передавать.", value: 5 }, 
+                    { text: "Поделюсь информацией с несколькими людьми, добавив 'но это не точно'.", value: 8 }, 
+                    { text: "Расскажу всем, кого знаю, ведь люди должны знать правду о человеке.", value: 10 }
+                ] 
+            },
+            { 
+                question: "В ресторане официант принес не то блюдо, которое ты заказывал, но оно оказалось дороже. Как поступишь?", 
+                answers: [
+                    { text: "Скажу официанту об ошибке и попрошу принести то, что заказывал.", value: 0 }, 
+                    { text: "Съем то, что принесли, но попрошу пересчитать счет согласно заказу.", value: 2 }, 
+                    { text: "Съем молча, но потом оставлю негативный отзыв о невнимательности персонала.", value: 6 }, 
+                    { text: "Устрою скандал, потребую компенсацию и пригрожу жалобой в санэпидемстанцию.", value: 10 }
+                ] 
+            },
+            { 
+                question: "Твой сосед регулярно слушает громкую музыку по вечерам. Попытки договориться не помогли. Последний ход?", 
+                answers: [
+                    { text: "Попробую еще раз поговорить, возможно, с предложением компромисса по времени.", value: 0 }, 
+                    { text: "Обращусь в управляющую компанию с официальной жалобой.", value: 2 }, 
+                    { text: "Начну специально шуметь в то время, когда он спит или отдыхает.", value: 8 }, 
+                    { text: "Испорчу что-то из его имущества анонимно, чтобы он понял намек.", value: 10 }
+                ] 
+            }
+        ];
+
+        const progressBar = document.getElementById('progress-bar');
+        const questionContainer = document.getElementById('question-container');
+        const resultContainer = document.getElementById('result-container');
+        const quizHeader = document.querySelector('.quiz-header');
+        const quizFooter = document.getElementById('quiz-footer');
+
+        const questionEl = document.getElementById('question');
+        const answersEl = document.getElementById('answers');
+        const submitBtn = document.getElementById('submit-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyNotification = document.getElementById('copy-notification');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let finalResult = {};
+
+        loadQuiz();
+
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function loadQuiz() {
+            deselectAnswers();
+            updateProgressBar();
+            
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    const questionContainer = document.getElementById('question-container');
+                    questionContainer.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }, 100);
+            }
+            
+            const currentQuizData = quizData[currentQuestionIndex];
+            questionEl.style.animation = 'none';
+            void questionEl.offsetWidth;
+            questionEl.style.animation = 'question-in 0.4s forwards';
+            
+            questionEl.innerText = currentQuizData.question;
+            
+            answersEl.innerHTML = ''; 
+            currentQuizData.answers.forEach(answer => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <input type="radio" name="answer" id="${answer.value}-${answer.text}" value="${answer.value}">
+                    <label for="${answer.value}-${answer.text}">${answer.text}</label>
+                `;
+                answersEl.appendChild(li);
+            });
+            
+            submitBtn.disabled = true;
+            document.querySelectorAll('input[name="answer"]').forEach(input => {
+                input.addEventListener('change', () => {
+                    submitBtn.disabled = false;
+                });
+            });
+        }
+
+        function deselectAnswers() {
+            const answerEls = document.querySelectorAll('input[name="answer"]');
+            answerEls.forEach(answerEl => answerEl.checked = false);
+        }
+
+        function getSelected() {
+            let answer;
+            const answerEls = document.querySelectorAll('input[name="answer"]');
+            answerEls.forEach(answerEl => {
+                if(answerEl.checked) {
+                    answer = answerEl.value;
+                }
+            });
+            return answer;
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const answer = getSelected();
+            if(answer) {
+                score += parseInt(answer);
+                currentQuestionIndex++;
+                if(currentQuestionIndex < quizData.length) {
+                    loadQuiz();
+                } else {
+                    progressBar.style.width = `100%`;
+                    showResults();
+                }
+            }
+        });
+
+        function showResults() {
+            const maxScore = quizData.length * 10;
+            const percentage = Math.round((score / maxScore) * 100);
+
+            let resultTitle, interpretation;
+
+            if (percentage <= 20) {
+                resultTitle = "Здоровая Личность";
+                interpretation = "Поздравляем! Ты редкий экземпляр нетоксичного человека. Умеешь конструктивно решать конфликты, не манипулируешь людьми и не срываешь злость на окружающих. Твоя моральная система хорошо развита, и люди чувствуют себя безопасно рядом с тобой.";
+            } else if (percentage <= 45) {
+                resultTitle = "Лёгкая Примесь";
+                interpretation = "В основном ты адекватный человек, но иногда можешь быть немного токсичным. В стрессе или когда что-то идёт не по плану, можешь сорваться или повести себя не очень красиво. Главное — ты это осознаёшь и стараешься работать над собой.";
+            } else if (percentage <= 70) {
+                resultTitle = "Средний Токсик";
+                interpretation = "Ага, а вот и проблемка! Ты довольно токсичный товарищ. Любишь поманипулировать, не прочь подставить других ради своей выгоды, а иногда и вовсе ведёшь себя как настоящий эгоист. Люди вокруг тебя явно не всегда в восторге от общения с тобой.";
+            } else {
+                resultTitle = "Чистый Яд";
+                interpretation = "Ого! Ты настоящий мастер токсичности! Манипуляции, эгоизм, месть, сплетни — это всё про тебя. Ты легко можешь испортить настроение всем вокруг и даже не заметить этого. Людям с тобой тяжело, и многие предпочитают держаться подальше. Может, стоит немного поработать над собой?";
+            }
+            
+            finalResult = { percentage, resultTitle, interpretation };
+
+            quizHeader.classList.add('hidden');
+            questionContainer.classList.add('hidden');
+            quizFooter.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+
+            document.getElementById('percentage').innerText = `${percentage}%`;
+            document.getElementById('result-title').innerText = resultTitle;
+            document.getElementById('interpretation').innerText = interpretation;
+        }
+        
+        copyBtn.addEventListener('click', () => {
+            const { percentage, resultTitle, interpretation } = finalResult;
+            const textToCopy = `
+Мой результат в тесте "Насколько ты Токсик?":
+
+☠️💀 ${percentage}% - ${resultTitle}
+💬 Вердикт: "${interpretation}"
+            `.trim();
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyNotification.style.opacity = '1';
+                setTimeout(() => {
+                    copyNotification.style.opacity = '0';
+                }, 2000);
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        });
+    </script>
+</body>
+</html>
