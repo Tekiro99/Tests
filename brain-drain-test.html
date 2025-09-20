@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Насколько ты Выносишь Мозг?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+        :root {
+            --accent-color: #FF69B4;
+            --accent-hover-color: #FF1493;
+            --text-color: #f0f0f0;
+            --bg-color: rgba(25, 25, 35, 0.4);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --bg-grad-start: #8B008B;
+            --bg-grad-end: #FF69B4;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+            padding: 20px;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+        .quiz-container {
+            background: var(--bg-color);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: rgba(0,0,0,0.2);
+            height: 8px;
+        }
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #FF69B4, #FF1493, #8B008B);
+            transition: width 0.4s ease-in-out;
+        }
+        .quiz-header {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .quiz-header p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        #question-container {
+            padding: 0 30px 30px;
+        }
+        #question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            animation: question-in 0.4s forwards;
+        }
+        @keyframes question-in {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .answers {
+            list-style-type: none;
+        }
+        .answers li {
+            margin-bottom: 10px;
+        }
+        .answers label {
+            display: block;
+            padding: 14px 16px;
+            background-color: rgba(255,255,255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 15px;
+            line-height: 1.3;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .answers label:hover {
+            background-color: rgba(255,255,255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        .answers input[type="radio"] {
+            display: none;
+        }
+        .answers input[type="radio"]:checked + label {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+            font-weight: 600;
+        }
+        .quiz-footer {
+            padding: 0 30px 30px;
+        }
+        .action-btn {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            display: block;
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .action-btn:hover:not(:disabled) {
+            background-color: var(--accent-hover-color);
+            transform: scale(1.02);
+        }
+        .action-btn:active:not(:disabled) {
+            transform: scale(0.99);
+        }
+        .action-btn:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
+        }
+        #result-container {
+            padding: 30px;
+            text-align: center;
+        }
+        #percentage {
+            font-size: 60px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin: 8px 0;
+            text-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+        }
+        #result-title {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+        #interpretation {
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 25px;
+        }
+        #copy-btn {
+            margin-top: 10px;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        #copy-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+        #copy-notification {
+            margin-top: 15px;
+            color: var(--accent-color);
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .back-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        .back-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .hidden {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .quiz-container { max-width: 100%; margin: 0; }
+            .quiz-header { padding: 20px 20px 15px 20px; }
+            h1 { font-size: 20px; margin-bottom: 6px; }
+            .quiz-header p { font-size: 13px; }
+            #question-container { padding: 0 20px 20px; }
+            #question { font-size: 16px; margin-bottom: 15px; line-height: 1.3; }
+            .answers li { margin-bottom: 8px; }
+            .answers label { padding: 12px 14px; font-size: 14px; line-height: 1.25; }
+            .quiz-footer { padding: 0 20px 20px; }
+            .action-btn { padding: 14px; font-size: 15px; }
+            #result-container { padding: 20px; }
+            #percentage { font-size: 48px; margin: 6px 0; }
+            #result-title { font-size: 18px; margin-bottom: 10px; }
+            #interpretation { font-size: 13px; line-height: 1.4; margin-bottom: 20px; }
+            .back-btn { margin-bottom: 15px; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .quiz-header { padding: 15px 15px 12px 15px; }
+            h1 { font-size: 18px; }
+            #question-container { padding: 0 15px 15px; }
+            #question { font-size: 15px; margin-bottom: 12px; }
+            .answers label { padding: 10px 12px; font-size: 13px; }
+            .quiz-footer { padding: 0 15px 15px; }
+            #result-container { padding: 15px; }
+            #percentage { font-size: 42px; }
+            #result-title { font-size: 16px; }
+            #interpretation { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="quiz-container">
+        <div class="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+        <div id="content-area">
+            <div class="quiz-header">
+                <button onclick="window.location.href='index.html'" class="action-btn back-btn">← Назад к тестам</button>
+                <h1>🧠💥 Тест: Насколько ты Выносишь Мозг? (для девушек)</h1>
+                <p>Женский тест на способность довести парня до белого каления. Провокационные сценарии с моральными дилеммами и сарказмом.</p>
+            </div>
+            <div id="question-container">
+                <p id="question"></p>
+                <ul class="answers" id="answers"></ul>
+            </div>
+            <div id="result-container" class="hidden">
+                <h2>Ваш результат:</h2>
+                <div id="percentage">0%</div>
+                <h3 id="result-title"></h3>
+                <p id="interpretation"></p>
+                <button id="copy-btn" class="action-btn">Копировать результат</button>
+                <p id="copy-notification">Скопировано!</p>
+                <button onclick="window.location.href='index.html'" class="action-btn back-btn" style="margin-top: 15px;">← Назад к тестам</button>
+            </div>
+            <div class="quiz-footer" id="quiz-footer">
+                <button id="submit-btn" class="action-btn" disabled>Далее</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const quizData = [
+            { 
+                question: "Твой парень играет в видеоигры уже 3 часа подряд, хотя обещал провести вечер с тобой. Как поступишь?", 
+                answers: [
+                    { text: "Скажу, что расстроена, и попрошу выделить время для нас.", value: 2 }, 
+                    { text: "Начну громко пылесосить рядом с ним и включу свой сериал на полную громкость.", value: 8 }, 
+                    { text: "Отключу Wi-Fi и скажу, что 'случайно' задела провод.", value: 10 }, 
+                    { text: "Займусь своими делами, поговорим об этом позже.", value: 0 }
+                ] 
+            },
+            {
+                question: "Вы с парнем выбираете ресторан. Он предлагает суши, ты хочешь пиццу. Что делаешь?",
+                answers: [
+                    { text: "Соглашусь на суши, главное - провести время вместе.", value: 0 },
+                    { text: "Предложу компромисс - сходим туда, где есть и то, и другое.", value: 3 },
+                    { text: "Буду ныть 20 минут, что не хочу суши, пока он не сдастся.", value: 9 },
+                    { text: "Скажу 'хорошо', но весь вечер буду дуться и отвечать 'нормально' на все вопросы.", value: 10 }
+                ]
+            },
+            { 
+                question: "Парень забыл про вашу годовщину. Твоя реакция?", 
+                answers: [
+                    { text: "Расстроюсь, но мягко напомню, что это важный день для нас.", value: 1 }, 
+                    { text: "Устрою допрос: 'А что для тебя вообще важно в отношениях?!'", value: 8 }, 
+                    { text: "Буду игнорировать его три дня, пока он сам не догадается, в чём дело.", value: 10 }, 
+                    { text: "Пошучу над этим и предложу отметить на выходных.", value: 0 }
+                ] 
+            },
+            { 
+                question: "Ты увидела, что твой парень лайкнул фото красивой девушки в купальнике. Что дальше?", 
+                answers: [
+                    { text: "Проигнорирую - это мелочь, не стоящая внимания.", value: 0 }, 
+                    { text: "Спрошу прямо, кто это и почему он лайкает такие фото.", value: 4 }, 
+                    { text: "Начну лайкать фото накачанных парней и посмотрю на его реакцию.", value: 8 }, 
+                    { text: "Устрою скандал: 'Значит, я тебе уже не нравлюсь?!'", value: 10 }
+                ] 
+            },
+            { 
+                question: "Парень сказал, что хочет провести пятничный вечер с друзьями. Ты планировала романтический ужин. Как отреагируешь?", 
+                answers: [
+                    { text: "Перенесу наш ужин на другой день, у каждого должны быть друзья.", value: 0 }, 
+                    { text: "Скажу, что расстроена, но пойму, если он уже обещал друзьям.", value: 2 }, 
+                    { text: "Начну рассказывать, как долго планировала этот вечер и как это для меня важно.", value: 7 }, 
+                    { text: "Скажу 'хорошо', но потом буду писать ему каждые полчаса, скучаю ли я.", value: 10 }
+                ] 
+            }
+        ];
+
+        const progressBar = document.getElementById('progress-bar');
+        const questionContainer = document.getElementById('question-container');
+        const resultContainer = document.getElementById('result-container');
+        const quizHeader = document.querySelector('.quiz-header');
+        const quizFooter = document.getElementById('quiz-footer');
+
+        const questionEl = document.getElementById('question');
+        const answersEl = document.getElementById('answers');
+        const submitBtn = document.getElementById('submit-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyNotification = document.getElementById('copy-notification');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let finalResult = {};
+
+        loadQuiz();
+
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function loadQuiz() {
+            deselectAnswers();
+            updateProgressBar();
+            
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    const questionContainer = document.getElementById('question-container');
+                    questionContainer.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }, 100);
+            }
+            
+            const currentQuizData = quizData[currentQuestionIndex];
+            questionEl.style.animation = 'none';
+            void questionEl.offsetWidth;
+            questionEl.style.animation = 'question-in 0.4s forwards';
+            
+            questionEl.innerText = currentQuizData.question;
+            
+            answersEl.innerHTML = ''; 
+            currentQuizData.answers.forEach(answer => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <input type="radio" name="answer" id="${answer.value}-${answer.text}" value="${answer.value}">
+                    <label for="${answer.value}-${answer.text}">${answer.text}</label>
+                `;
+                answersEl.appendChild(li);
+            });
+            
+            submitBtn.disabled = true;
+            document.querySelectorAll('input[name="answer"]').forEach(input => {
+                input.addEventListener('change', () => {
+                    submitBtn.disabled = false;
+                });
+            });
+        }
+
+        function deselectAnswers() {
+            const answerEls = document.querySelectorAll('input[name="answer"]');
+            answerEls.forEach(answerEl => answerEl.checked = false);
+        }
+
+        function getSelected() {
+            let answer;
+            const answerEls = document.querySelectorAll('input[name="answer"]');
+            answerEls.forEach(answerEl => {
+                if(answerEl.checked) {
+                    answer = answerEl.value;
+                }
+            });
+            return answer;
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const answer = getSelected();
+            if(answer) {
+                score += parseInt(answer);
+                currentQuestionIndex++;
+                if(currentQuestionIndex < quizData.length) {
+                    loadQuiz();
+                } else {
+                    progressBar.style.width = `100%`;
+                    showResults();
+                }
+            }
+        });
+
+        function showResults() {
+            const maxScore = quizData.length * 10;
+            const percentage = Math.round((score / maxScore) * 100);
+
+            let resultTitle, interpretation;
+
+            if (percentage <= 25) {
+                resultTitle = "Ангелочек";
+                interpretation = "Ты редкая находка! Почти никогда не выносишь мозг и умеешь решать конфликты мирно. Парни с тобой чувствуют себя комфортно. Возможно, иногда стоит быть чуть более требовательной к своим потребностям.";
+            } else if (percentage <= 50) {
+                resultTitle = "Умеренная Заноза";
+                interpretation = "Ты в меру требовательная девушка. Иногда можешь немного поворчать или устроить небольшую драму, но в целом остаёшься адекватной. Знаешь, когда остановиться, и не превращаешь мелочи в трагедии.";
+            } else if (percentage <= 75) {
+                resultTitle = "Мастер Драмы";
+                interpretation = "Ого, а ты умеешь создавать напряжение! Любишь эмоциональные разборки, помнишь все косяки парня и не стесняешься их припоминать. Твой парень точно знает, что такое 'женская логика' во всей красе.";
+            } else {
+                resultTitle = "Королева Психоза";
+                interpretation = "Поздравляем, ты настоящий мастер по выносу мозга! Устраиваешь сцены из-за лайков, контролируешь каждый шаг парня и превращаешь любую мелочь в мировую драму. Твой парень наверняка уже изучил все стадии женского гнева.";
+            }
+            
+            finalResult = { percentage, resultTitle, interpretation };
+
+            quizHeader.classList.add('hidden');
+            questionContainer.classList.add('hidden');
+            quizFooter.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+
+            document.getElementById('percentage').innerText = `${percentage}%`;
+            document.getElementById('result-title').innerText = resultTitle;
+            document.getElementById('interpretation').innerText = interpretation;
+        }
+        
+        copyBtn.addEventListener('click', () => {
+            const { percentage, resultTitle, interpretation } = finalResult;
+            const textToCopy = `
+Мой результат в тесте "Насколько ты Выносишь Мозг?":
+
+🧠💥 ${percentage}% - ${resultTitle}
+💬 Вердикт: "${interpretation}"
+            `.trim();
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyNotification.style.opacity = '1';
+                setTimeout(() => {
+                    copyNotification.style.opacity = '0';
+                }, 2000);
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        });
+    </script>
+</body>
+</html>
