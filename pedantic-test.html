@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Насколько ты Душнила?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+        :root {
+            --accent-color: #4682B4;
+            --accent-hover-color: #5F9EA0;
+            --text-color: #f0f0f0;
+            --bg-color: rgba(25, 25, 35, 0.4);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --bg-grad-start: #2F4F4F;
+            --bg-grad-end: #708090;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+            padding: 20px;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .quiz-container {
+            background: var(--bg-color);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: rgba(0,0,0,0.2);
+            height: 8px;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4682B4, #5F9EA0, #2F4F4F);
+            transition: width 0.4s ease-in-out;
+        }
+
+        .quiz-header {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .quiz-header p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #question-container {
+            padding: 0 30px 30px;
+        }
+
+        #question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            animation: question-in 0.4s forwards;
+        }
+
+        @keyframes question-in {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .answers {
+            list-style-type: none;
+        }
+
+        .answers li {
+            margin-bottom: 10px;
+        }
+
+        .answers label {
+            display: block;
+            padding: 14px 16px;
+            background-color: rgba(255,255,255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 15px;
+            line-height: 1.3;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .answers label:hover {
+            background-color: rgba(255,255,255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .answers input[type="radio"] {
+            display: none;
+        }
+
+        .answers input[type="radio"]:checked + label {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .quiz-footer {
+            padding: 0 30px 30px;
+        }
+        
+        .action-btn {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            display: block;
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            background-color: var(--accent-hover-color);
+            transform: scale(1.02);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: scale(0.99);
+        }
+        
+        .action-btn:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        #result-container {
+            padding: 30px;
+            text-align: center;
+        }
+
+        #percentage {
+            font-size: 60px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin: 8px 0;
+            text-shadow: 0 0 15px rgba(70, 130, 180, 0.5);
+        }
+
+        #result-title {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        #interpretation {
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 25px;
+        }
+
+        #copy-btn {
+            margin-top: 10px;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        #copy-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        #copy-notification {
+            margin-top: 15px;
+            color: var(--accent-color);
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .back-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .quiz-container {
+                border-radius: 15px;
+            }
+
+            .quiz-header {
+                padding: 25px 20px 15px 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .quiz-header p {
+                font-size: 13px;
+            }
+
+            #question-container {
+                padding: 0 20px 25px;
+            }
+
+            #question {
+                font-size: 16px;
+            }
+
+            .answers label {
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+
+            .quiz-footer {
+                padding: 0 20px 25px;
+            }
+
+            .action-btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            #result-container {
+                padding: 25px 20px;
+            }
+
+            #percentage {
+                font-size: 50px;
+            }
+
+            #result-title {
+                font-size: 18px;
+            }
+
+            #interpretation {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .quiz-header {
+                padding: 20px 15px 12px 15px;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+
+            #question-container {
+                padding: 0 15px 20px;
+            }
+
+            #question {
+                font-size: 15px;
+            }
+
+            .answers label {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            .quiz-footer {
+                padding: 0 15px 20px;
+            }
+
+            .action-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            #result-container {
+                padding: 20px 15px;
+            }
+
+            #percentage {
+                font-size: 40px;
+            }
+
+            #result-title {
+                font-size: 16px;
+            }
+
+            #interpretation {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+        
+        <div class="quiz-header">
+            <h1>🤓 Насколько ты душнила?</h1>
+            <p>Узнай, насколько ты любишь придираться к деталям!</p>
+        </div>
+        
+        <div id="question-container">
+            <div id="question"></div>
+            <ul class="answers" id="answers"></ul>
+        </div>
+        
+        <div class="quiz-footer">
+            <button id="next-btn" class="action-btn" onclick="nextQuestion()" disabled>Далее</button>
+        </div>
+        
+        <div id="result-container" style="display: none;">
+            <div id="result-title">Твой результат:</div>
+            <div id="percentage"></div>
+            <div id="interpretation"></div>
+            <button id="copy-btn" class="action-btn" onclick="copyResults()">Скопировать результат</button>
+            <button class="action-btn back-btn" onclick="goHome()">На главную</button>
+            <div id="copy-notification">Скопировано в буфер обмена!</div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Замечаешь орфографическую ошибку в чужом сообщении в соцсетях. Как поступишь?",
+                answers: [
+                    { text: "Проигнорирую - всем понятно, о чём речь", value: 0 },
+                    { text: "Мысленно отмечу, но никому не скажу", value: 2 },
+                    { text: "Напишу человеку в личку с деликатной поправкой", value: 6 },
+                    { text: "Прокомментирую публично с исправлением", value: 10 }
+                ]
+            },
+            {
+                question: "Коллега делает презентацию и допускает грамматическую ошибку. Твоя реакция?",
+                answers: [
+                    { text: "Концентрируюсь на содержании, а не на форме", value: 0 },
+                    { text: "Немного напрягает, но терплю молча", value: 3 },
+                    { text: "Напишу исправление в рабочий чат", value: 7 },
+                    { text: "Подниму руку и поправлю прямо во время презентации", value: 10 }
+                ]
+            },
+            {
+                question: "Друг использует неправильную форму слова в разговоре. Что сделаешь?",
+                answers: [
+                    { text: "Ничего - главное, что мы понимаем друг друга", value: 0 },
+                    { text: "Просто продолжу разговор по теме", value: 1 },
+                    { text: "Мягко поправлю в процессе беседы", value: 5 },
+                    { text: "Остановлю разговор и объясню правильную форму", value: 10 }
+                ]
+            },
+            {
+                question: "В ресторане тебе приносят не совсем то, что заказывал. Твои действия?",
+                answers: [
+                    { text: "Ем то, что принесли - не критично", value: 0 },
+                    { text: "Вежливо прошу заменить на правильное блюдо", value: 2 },
+                    { text: "Подробно объясняю официанту, в чём отличия", value: 6 },
+                    { text: "Требую менеджера и читаю лекцию о важности точности", value: 10 }
+                ]
+            },
+            {
+                question: "В групповом чате кто-то шутит, но с ошибками в тексте. Как отреагируешь?",
+                answers: [
+                    { text: "Смеюсь над шуткой, игнорирую ошибки", value: 0 },
+                    { text: "Ставлю лайк, если действительно смешно", value: 1 },
+                    { text: "Отвечаю шуткой, но с правильным написанием", value: 7 },
+                    { text: "Объясняю, что ошибки портят впечатление от юмора", value: 10 }
+                ]
+            },
+            {
+                question: "Собеседник использует математически некорректное выражение. Как поступишь?",
+                answers: [
+                    { text: "Понимаю суть и не заостряю внимание", value: 0 },
+                    { text: "Киваю и продолжаю слушать", value: 1 },
+                    { text: "Деликатно предлагаю более точную формулировку", value: 6 },
+                    { text: "Читаю мини-лекцию о правильном использовании терминов", value: 10 }
+                ]
+            },
+            {
+                question: "Водитель такси выбирает не самый оптимальный маршрут. Что делаешь?",
+                answers: [
+                    { text: "Молчу - он профессионал, наверное знает лучше", value: 0 },
+                    { text: "Мысленно прокладываю свой маршрут, но не вмешиваюсь", value: 2 },
+                    { text: "Вежливо предлагаю альтернативный путь", value: 6 },
+                    { text: "Подробно объясняю, почему мой вариант эффективнее", value: 10 }
+                ]
+            },
+            {
+                question: "На форуме кто-то просит помощи, но с ошибками в сообщении. Как поможешь?",
+                answers: [
+                    { text: "Отвечаю только по сути вопроса", value: 0 },
+                    { text: "Помогаю решить проблему и желаю удачи", value: 1 },
+                    { text: "Помогаю, но аккуратно указываю на ошибки", value: 7 },
+                    { text: "Сначала исправляю все ошибки, потом отвечаю на вопрос", value: 10 }
+                ]
+            },
+            {
+                question: "Знакомый путает род/падеж в обычном разговоре. Твоя реакция?",
+                answers: [
+                    { text: "Не обращаю внимания - понятно из контекста", value: 0 },
+                    { text: "Продолжаю беседу, не акцентируя внимание", value: 1 },
+                    { text: "Мягко поправляю в шутливой форме", value: 5 },
+                    { text: "Серьёзно объясняю грамматические правила", value: 10 }
+                ]
+            },
+            {
+                question: "В компании кто-то рассказывает историю с фактическими неточностями. Что сделаешь?",
+                answers: [
+                    { text: "Слушаю ради развлечения, факты не главное", value: 0 },
+                    { text: "Наслаждаюсь рассказом, не придираюсь к деталям", value: 2 },
+                    { text: "После истории тактично уточняю правильные факты", value: 6 },
+                    { text: "Прерываю и сразу исправляю неточности", value: 10 }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let totalScore = 0;
+
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('question').innerHTML = `<strong>Вопрос ${currentQuestionIndex + 1} из ${questions.length}</strong><br><br>${question.question}`;
+            
+            const answersContainer = document.getElementById('answers');
+            answersContainer.innerHTML = '';
+            
+            question.answers.forEach((answer, index) => {
+                const li = document.createElement('li');
+                const input = document.createElement('input');
+                const label = document.createElement('label');
+                
+                input.type = 'radio';
+                input.name = 'answer';
+                input.value = index;
+                input.id = `answer${index}`;
+                input.addEventListener('change', () => selectAnswer(index));
+                
+                label.textContent = answer.text;
+                label.setAttribute('for', `answer${index}`);
+                
+                li.appendChild(input);
+                li.appendChild(label);
+                answersContainer.appendChild(li);
+            });
+            
+            updateProgressBar();
+            updateNextButton();
+        }
+
+        function selectAnswer(answerIndex) {
+            userAnswers[currentQuestionIndex] = answerIndex;
+            updateNextButton();
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        function updateNextButton() {
+            const nextBtn = document.getElementById('next-btn');
+            const hasAnswer = userAnswers[currentQuestionIndex] !== undefined;
+            
+            nextBtn.disabled = !hasAnswer;
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.textContent = hasAnswer ? 'Узнать результат' : 'Выберите ответ';
+            } else {
+                nextBtn.textContent = hasAnswer ? 'Далее' : 'Выберите ответ';
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            // Calculate total score
+            totalScore = 0;
+            userAnswers.forEach((answerIndex, questionIndex) => {
+                totalScore += questions[questionIndex].answers[answerIndex].value;
+            });
+            
+            const maxScore = questions.reduce((sum, q) => sum + Math.max(...q.answers.map(a => a.value)), 0);
+            const percentage = Math.round((totalScore / maxScore) * 100);
+            
+            // Hide question container and show results
+            document.getElementById('question-container').style.display = 'none';
+            document.querySelector('.quiz-footer').style.display = 'none';
+            document.getElementById('result-container').style.display = 'block';
+            
+            document.getElementById('percentage').textContent = percentage + '%';
+            
+            let interpretation = '';
+            if (percentage <= 20) {
+                interpretation = "🌊 Ты как морской бриз - лёгкий и ненавязчивый! Ошибки других тебя не беспокоят, ты живёшь и даёшь жить другим. Твоя суперсила - умение не париться по мелочам и наслаждаться моментом!";
+            } else if (percentage <= 45) {
+                interpretation = "🧘 Ты мастер самоконтроля! Замечаешь косяки, но мудро держишь язык за зубами. Иногда всё же не выдерживаешь и тактично поправляешь, но это скорее мило, чем раздражающе. Золотая середина!";
+            } else if (percentage <= 75) {
+                interpretation = "🔍 У тебя глаз алмаз на детали! Не можешь пройти мимо ошибок и активно их исправляешь. Друзья уже привыкли к твоим поправкам, но иногда закатывают глаза. Возможно, стоит иногда включать внутренний фильтр?";
+            } else {
+                interpretation = "👨‍🏫 Поздравляем, ты сертифицированная душнила! Ты живой словарь и справочник правил. Твоя миссия - нести свет знаний в массы, даже если массы об этом не просят. Друзья боятся писать тебе сообщения без проверки орфографии!";
+            }
+            
+            document.getElementById('interpretation').textContent = interpretation;
+        }
+
+        function copyResults() {
+            const percentage = document.getElementById('percentage').textContent;
+            const interpretation = document.getElementById('interpretation').textContent;
+            const textToCopy = `Мой результат теста "Насколько ты душнила?": ${percentage}
+
+${interpretation}
+
+Пройди тест сам: ${window.location.href}`;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const notification = document.getElementById('copy-notification');
+                notification.style.opacity = '1';
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                }, 2000);
+            });
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        // Initialize the quiz
+        loadQuestion();
+    </script>
+</body>
+</html>
