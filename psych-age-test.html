@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Психологический возраст</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+        :root {
+            --accent-color: #00C9A7;
+            --accent-hover-color: #00b098;
+            --text-color: #f0f0f0;
+            --bg-color: rgba(25, 35, 35, 0.45);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --bg-grad-start: #0f2027;
+            --bg-grad-end: #2c5364;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+            padding: 20px;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .quiz-container {
+            background: var(--bg-color);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 680px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        .progress-bar-container { width: 100%; background: rgba(0,0,0,0.2); height: 8px; }
+        #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #00C9A7, #30E3CA, #2c5364); transition: width 0.4s ease-in-out; }
+
+        .quiz-header { padding: 28px 28px 18px; text-align: center; }
+        h1 { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+        .quiz-header p { font-size: 14px; color: rgba(255,255,255,0.75); }
+
+        #question-container { padding: 0 28px 26px; }
+        #question { font-size: 18px; font-weight: 600; margin-bottom: 18px; line-height: 1.45; animation: question-in 0.35s forwards; }
+        @keyframes question-in { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: translateX(0); } }
+
+        .answers { list-style: none; }
+        .answers li { margin-bottom: 10px; }
+        .answers label {
+            display: block;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 15px;
+            line-height: 1.3;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .answers label:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
+        .answers input[type="radio"] { display: none; }
+        .answers input[type="radio"]:checked + label { background: var(--accent-color); color: var(--text-color); border-color: var(--accent-color); font-weight: 600; }
+
+        .quiz-footer { padding: 0 28px 28px; }
+        .action-btn {
+            background: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            display: block;
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .action-btn:hover:not(:disabled) { background: var(--accent-hover-color); transform: scale(1.02); }
+        .action-btn:active:not(:disabled) { transform: scale(0.99); }
+        .action-btn:disabled { background: #546; color: #9bb; cursor: not-allowed; }
+
+        #result-container { padding: 28px; text-align: center; }
+        #age-number { font-size: 56px; font-weight: 800; color: var(--accent-color); margin: 8px 0 2px; text-shadow: 0 0 16px rgba(0, 201, 167, 0.45); }
+        #result-title { font-size: 20px; margin-bottom: 12px; }
+        #interpretation { font-size: 14px; line-height: 1.55; color: rgba(255,255,255,0.9); margin-bottom: 22px; }
+
+        #copy-btn { margin-top: 8px; background: rgba(255,255,255,0.14); }
+        #copy-btn:hover:not(:disabled) { background: rgba(255,255,255,0.22); }
+        #copy-notification { margin-top: 14px; color: var(--accent-color); font-weight: 700; opacity: 0; transition: opacity 0.25s ease; }
+
+        .back-btn { background: rgba(255,255,255,0.1); margin-bottom: 18px; }
+        .back-btn:hover:not(:disabled) { background: rgba(255,255,255,0.18); }
+
+        .hidden { display: none; }
+
+        @media (max-width: 768px) {
+            body { padding: 14px; }
+            .quiz-container { max-width: 100%; }
+            .quiz-header { padding: 20px 20px 14px; }
+            h1 { font-size: 20px; }
+            .quiz-header p { font-size: 13px; }
+            #question-container { padding: 0 20px 18px; }
+            #question { font-size: 16px; margin-bottom: 14px; }
+            .answers label { padding: 12px 14px; font-size: 14px; }
+            .quiz-footer { padding: 0 20px 20px; }
+            #result-container { padding: 20px; }
+            #age-number { font-size: 46px; }
+            #result-title { font-size: 18px; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .quiz-header { padding: 16px 16px 12px; }
+            h1 { font-size: 18px; }
+            #question { font-size: 15px; }
+            .answers label { padding: 10px 12px; font-size: 13px; }
+            #age-number { font-size: 40px; }
+        }
+    </style>
+    <meta name="description" content="Узнай свой психологический возраст по 10 творческим вопросам: зрелость, гибкость мышления, забота о себе и отношение к риску.">
+    <meta name="theme-color" content="#00C9A7">
+</head>
+<body>
+    <div class="quiz-container" id="quiz-container">
+        <div class="progress-bar-container"><div id="progress-bar"></div></div>
+        <div id="content-area">
+            <div class="quiz-header">
+                <button onclick="window.location.href='index.html'" class="action-btn back-btn">← На главную</button>
+                <h1>🧠⏳ Психологический возраст</h1>
+                <p>Ответьте на 10 вопросов о привычках, решениях и отношении к жизни — и узнайте, сколько лет вашему внутреннему «я».</p>
+            </div>
+            <div id="question-container">
+                <p id="question"></p>
+                <ul class="answers" id="answers"></ul>
+            </div>
+
+            <div id="result-container" class="hidden">
+                <h2>Ваш психологический возраст:</h2>
+                <div id="age-number">0</div>
+                <h3 id="result-title"></h3>
+                <p id="interpretation"></p>
+                <button id="copy-btn" class="action-btn">Скопировать результат</button>
+                <p id="copy-notification">Скопировано!</p>
+                <button onclick="window.location.href='index.html'" class="action-btn back-btn" style="margin-top: 14px;">← На главную</button>
+            </div>
+
+            <div class="quiz-footer" id="quiz-footer">
+                <button id="submit-btn" class="action-btn" disabled>Далее</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Утро выходного: что первым делом?",
+                answers: [
+                    { text: "Игры/ролики до обеда — я отдыхаю", value: 0 },
+                    { text: "Спонтанная прогулка/встреча без планов", value: 3 },
+                    { text: "Небольшой список дел и приятности", value: 6 },
+                    { text: "Спорт, дела, потом качественный отдых", value: 10 }
+                ]
+            },
+            {
+                question: "Неожиданная проблема в будний день. Ваша реакция?",
+                answers: [
+                    { text: "Паникую/откладываю — вдруг само рассосётся", value: 0 },
+                    { text: "Спрашиваю совета и пробую что-то", value: 3 },
+                    { text: "Спокойно разбиваю на шаги и решаю", value: 7 },
+                    { text: "План B/C заранее — действую уверенно", value: 10 }
+                ]
+            },
+            {
+                question: "Планы на год — как вы с ними?",
+                answers: [
+                    { text: "Планы? Живу сегодняшним днём", value: 0 },
+                    { text: "Мечтаю, но без конкретики", value: 3 },
+                    { text: "Ставлю 2–3 цели и двигаюсь", value: 7 },
+                    { text: "Чёткая система: цели, ресурсы, дедлайны", value: 10 }
+                ]
+            },
+            {
+                question: "Деньги: что важнее прямо сейчас?",
+                answers: [
+                    { text: "Впечатления и импульсивные радости", value: 2 },
+                    { text: "Баланс: и удовольствие, и подушка", value: 6 },
+                    { text: "Финансовая дисциплина и долгосрочные цели", value: 9 },
+                    { text: "Инвестиции, диверсификация, учёт рисков", value: 10 }
+                ]
+            },
+            {
+                question: "Новые знакомства для вас — это…",
+                answers: [
+                    { text: "Стресс — лучше не надо", value: 1 },
+                    { text: "Иногда — по настроению", value: 4 },
+                    { text: "Интерес и расширение горизонтов", value: 7 },
+                    { text: "Осознанный нетворкинг и обмен возможностями", value: 10 }
+                ]
+            },
+            {
+                question: "Конфликт на работе/в команде. Что делаете?",
+                answers: [
+                    { text: "Обиделся/ушёл в игнор", value: 0 },
+                    { text: "Эмоционально высказался и отпустил", value: 3 },
+                    { text: "Обсуждаю факты и ищу решения", value: 7 },
+                    { text: "Медиирую: интересы, договорённости, фоллоу-ап", value: 10 }
+                ]
+            },
+            {
+                question: "Забота о здоровье…",
+                answers: [
+                    { text: "Когда ‘припечёт’", value: 1 },
+                    { text: "Стараюсь, но часто срываюсь", value: 4 },
+                    { text: "Базовые привычки и чекапы", value: 7 },
+                    { text: "Системно: сон, питание, спорт, профилактика", value: 10 }
+                ]
+            },
+            {
+                question: "Обучение и навыки: как подходите?",
+                answers: [
+                    { text: "Смотрю короткие видосы и всё", value: 1 },
+                    { text: "Курсы время от времени", value: 4 },
+                    { text: "Целенаправленно прокачиваю компетенции", value: 7 },
+                    { text: "Учусь постоянно и применяю сразу", value: 10 }
+                ]
+            },
+            {
+                question: "Отдых и развлечения — ваш формат?",
+                answers: [
+                    { text: "До упаду, без тормозов", value: 1 },
+                    { text: "Как получится, без планов", value: 4 },
+                    { text: "Баланс отдыха и восстановления", value: 7 },
+                    { text: "Осознанный отдых: энергия, люди, среда", value: 10 }
+                ]
+            },
+            {
+                question: "Отношение к риску",
+                answers: [
+                    { text: "Беру всё и сразу!", value: 1 },
+                    { text: "Рискую изредка — по ощущениям", value: 4 },
+                    { text: "Считаю сценарии и иду в разумный риск", value: 7 },
+                    { text: "Детально считаю риск/доходность и лимиты", value: 10 }
+                ]
+            }
+        ];
+
+        const progressBar = document.getElementById('progress-bar');
+        const questionContainer = document.getElementById('question-container');
+        const resultContainer = document.getElementById('result-container');
+        const quizHeader = document.querySelector('.quiz-header');
+        const quizFooter = document.getElementById('quiz-footer');
+
+        const questionEl = document.getElementById('question');
+        const answersEl = document.getElementById('answers');
+        const submitBtn = document.getElementById('submit-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyNotification = document.getElementById('copy-notification');
+
+        let currentQuestionIndex = 0;
+        let score = 0; // 0..100
+        let finalResult = {};
+
+        loadQuiz();
+
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function loadQuiz() {
+            deselectAnswers();
+            updateProgressBar();
+
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    document.getElementById('question-container')
+                        .scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 80);
+            }
+
+            const currentQuizData = quizData[currentQuestionIndex];
+            questionEl.style.animation = 'none'; void questionEl.offsetWidth; questionEl.style.animation = 'question-in 0.35s forwards';
+            questionEl.innerText = currentQuizData.question;
+
+            answersEl.innerHTML = '';
+            currentQuizData.answers.forEach((answer, idx) => {
+                const li = document.createElement('li');
+                const id = `${currentQuestionIndex}-${idx}`;
+                li.innerHTML = `
+                    <input type="radio" name="answer" id="${id}" value="${answer.value}">\n                    <label for="${id}">${answer.text}</label>
+                `;
+                answersEl.appendChild(li);
+            });
+
+            submitBtn.disabled = true;
+            document.querySelectorAll('input[name="answer"]').forEach(input => {
+                input.addEventListener('change', () => { submitBtn.disabled = false; });
+            });
+        }
+
+        function deselectAnswers() {
+            document.querySelectorAll('input[name="answer"]').forEach(el => el.checked = false);
+        }
+
+        function getSelected() {
+            let answer;
+            document.querySelectorAll('input[name="answer"]').forEach(el => { if (el.checked) answer = el.value; });
+            return answer;
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const answer = getSelected();
+            if (answer != null) {
+                score += parseInt(answer);
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    loadQuiz();
+                } else {
+                    progressBar.style.width = `100%`;
+                    showResults();
+                }
+            }
+        });
+
+        function bandForAge(age) {
+            if (age <= 17) return {
+                title: 'Подростковая искра',
+                text: 'Много живости и дерзости, высокая чувствительность к новому. Важно учиться доводить начатое до результата и беречь ресурсы сна и внимания.'
+            };
+            if (age <= 25) return {
+                title: 'Юношеская гибкость',
+                text: 'Вы быстро схватываете возможности и экспериментируете. Усиливайте системность, чтобы идеи превращались в устойчивые привычки и проекты.'
+            };
+            if (age <= 35) return {
+                title: 'Взрослая устойчивость',
+                text: 'Балансируете удовольствие и ответственность, умеете планировать и беречь себя. Добавьте больше творчества и игры — так вы ускорите рост без выгорания.'
+            };
+            if (age <= 45) return {
+                title: 'Зрелая осознанность',
+                text: 'Опора на ценности и долгий горизонт. Выбираете стратегически и экологично. Полезно оставлять место спонтанности — она питает интуицию.'
+            };
+            return {
+                title: 'Мудрая глубина',
+                text: 'Опыт и дальновидность, спокойствие под давлением. Делитесь наставничеством и поддерживайте тело движением и игрой — так психика остаётся молодой.'
+            };
+        }
+
+        function showResults() {
+            const maxScore = quizData.length * 10; // 100
+            const clamped = Math.max(0, Math.min(score, maxScore));
+            const age = 12 + Math.round((clamped / maxScore) * 48); // 12..60
+
+            const band = bandForAge(age);
+            finalResult = { age, resultTitle: band.title, interpretation: band.text };
+
+            quizHeader.classList.add('hidden');
+            questionContainer.classList.add('hidden');
+            quizFooter.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+
+            document.getElementById('age-number').innerText = `${age}`;
+            document.getElementById('result-title').innerText = band.title;
+            document.getElementById('interpretation').innerText = band.text;
+        }
+
+        copyBtn.addEventListener('click', () => {
+            const { age, resultTitle, interpretation } = finalResult;
+            const textToCopy = `
+Результат теста \"Психологический возраст\":
+
+Возраст: ${age} лет — ${resultTitle}
+Описание: ${interpretation}
+`.trim();
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyNotification.style.opacity = '1';
+                setTimeout(() => { copyNotification.style.opacity = '0'; }, 1800);
+            }).catch(err => { console.error('Could not copy text: ', err); });
+        });
+    </script>
+</body>
+</html>
+
